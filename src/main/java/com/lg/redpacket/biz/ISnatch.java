@@ -1,6 +1,7 @@
 package com.lg.redpacket.biz;
 
 import com.lg.redpacket.common.BigDecimalUtils;
+import com.lg.redpacket.model.RedPacket;
 
 import java.math.BigDecimal;
 import java.util.Random;
@@ -19,10 +20,10 @@ public interface ISnatch {
 
     /**
      *
-     * @param id 红包ID
+     * @param redPacket 红包
      * @return 返回抢到的金额，如果为null，表示没有抢到
      */
-    BigDecimal snatch(Integer id);
+    BigDecimal snatch(RedPacket redPacket);
 
     /** 分钱
      * @param amount 金额

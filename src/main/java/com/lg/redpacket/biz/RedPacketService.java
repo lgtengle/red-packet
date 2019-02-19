@@ -3,6 +3,7 @@ package com.lg.redpacket.biz;
 import com.lg.redpacket.common.BigDecimalUtils;
 import com.lg.redpacket.model.Person;
 import com.lg.redpacket.model.RedPacket;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,9 +22,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class RedPacketService {
 
-    private Map<Integer, RedPacket> redPacketMap = new HashMap<>();
-
     private AtomicInteger atoRedId = new AtomicInteger(0);
+
+    @Autowired
+    ISend iSend;
 
     /**
      * 创建红包
@@ -53,9 +55,10 @@ public class RedPacketService {
 
             //生成红包记录
             RedPacket redPacket = new RedPacket(id, person.getId(), person.getName(), amount, amount, num, desc);
-            redPacketMap.put(redPacket.getId(), redPacket);
-            //减去发红包人账户中的钱
-            person.setAmount(person.getAmount().subtract(amount));
+            if (iSend.send(redPacket)) {
+                //减去发红包人账户中的钱
+                person.setAmount(person.getAmount().subtract(amount));
+            }
         }catch (Exception e){
             e.printStackTrace();
             return 0;
@@ -65,16 +68,5 @@ public class RedPacketService {
 
         return id;
     }
-
-    /**
-     * 获取红包
-     * @param id 红包ID
-     * @return
-     */
-    public RedPacket get(int id){
-
-        return redPacketMap.get(id);
-    }
-
 
 }

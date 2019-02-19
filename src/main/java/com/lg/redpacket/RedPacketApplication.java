@@ -2,6 +2,8 @@ package com.lg.redpacket;
 
 import com.lg.redpacket.biz.ISnatch;
 import com.lg.redpacket.biz.RedPacketService;
+import com.lg.redpacket.biz.syn.SynchConsumer;
+import com.lg.redpacket.biz.syn.SynchSendSnatch;
 import com.lg.redpacket.common.BigDecimalUtils;
 import com.lg.redpacket.common.SpringContextUtil;
 import com.lg.redpacket.model.Person;
@@ -14,6 +16,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @SpringBootApplication
 @Component
@@ -31,25 +34,23 @@ public class RedPacketApplication {
 
     }
 
-    @Resource(name = "synchSnatchImpl")
+    @Resource(name = "synchSendSnatch")
     ISnatch snatch;
 
     @Autowired
     RedPacketService redPacketService;
 
+    @Resource
+    private ThreadPoolExecutor threadPoolExecutor;
+
     public void synchRun() throws Exception {
         Person p1 = new Person(1, "王五", BigDecimalUtils.get(100));
 
-        int id = redPacketService.create(BigDecimalUtils.get(0.05), 5, "发红包喽", p1);
+        redPacketService.create(BigDecimalUtils.get(0.05), 5, "发红包喽", p1);
 
-        List<Person> personList = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
             Person p = new Person(1, "测试"+i, BigDecimal.ZERO);
-            BigDecimal snatch = this.snatch.snatch(id);
-            if (null != snatch)
-                p.setAmount(p.getAmount().add(snatch));
-            personList.add(p);
-            System.out.println(p);
+            threadPoolExecutor.submit(new SynchConsumer(p, snatch));
         }
 
         System.out.println(p1);

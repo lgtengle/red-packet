@@ -1,30 +1,42 @@
-package com.lg.redpacket.biz;
+package com.lg.redpacket.biz.syn;
 
+import com.lg.redpacket.biz.ISend;
+import com.lg.redpacket.biz.ISnatch;
+import com.lg.redpacket.biz.RedPacketService;
+import com.lg.redpacket.model.Person;
 import com.lg.redpacket.model.RedPacket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
- * description: Java同步方式抢红包实现类
+ * description:
  * </p>
- * Created on 2019/2/16 21:41
  *
  * @author leiguang
+ * @version 0.1.0
+ * @date 2019-02-19 15:48
  */
 @Service
-public class SynchSnatchImpl implements ISnatch {
+public class SynchSendSnatch implements ISnatch, ISend {
 
+    public static Map<Integer, RedPacket> redPacketMap = new HashMap<>();
 
     @Autowired
     RedPacketService redPacketService;
 
     @Override
-    public BigDecimal snatch(Integer id) {
-        RedPacket redPacket = redPacketService.get(id);
+    public boolean send(RedPacket redPacket) {
+        redPacketMap.put(redPacket.getId(), redPacket);
+        return true;
+    }
 
+    @Override
+    public BigDecimal snatch(RedPacket redPacket) {
         if (redPacket.getLeftAmount().compareTo(MIN_MONEY) >= 0) {
             synchronized (redPacket) {
                 if (redPacket.getLeftAmount().compareTo(MIN_MONEY) >= 0) {
