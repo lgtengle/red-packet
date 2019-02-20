@@ -14,15 +14,22 @@ import java.math.RoundingMode;
  */
 public class BigDecimalUtils {
 
-    public static final MathContext mc = new MathContext(5, RoundingMode.DOWN);
+    public static final MathContext mc = new MathContext(2, RoundingMode.DOWN);
 
     public static BigDecimal get(int i){
-        return new BigDecimal(i, mc);
+        return new BigDecimal(i);
     }
 
     public static BigDecimal get(double i){
-        return new BigDecimal(i, mc);
+        return BigDecimal.valueOf(i);
     }
 
 
+    public static BigDecimal get(BigDecimal bigDecimal){
+        return bigDecimal.setScale(2, BigDecimal.ROUND_DOWN);
+    }
+
+    public static void main(String[] args){
+        System.out.println(BigDecimalUtils.get((4 - 1) * 0.01));
+    }
 }

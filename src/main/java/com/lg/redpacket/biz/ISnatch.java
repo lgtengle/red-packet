@@ -27,23 +27,21 @@ public interface ISnatch {
 
     /** 分钱
      * @param amount 金额
-     * @param num 红包个数
      * @return 计算本次抢到红包的个数
      */
-    default BigDecimal divide(BigDecimal amount, int num){
-        //先将其他人的最少可以分到的钱预留出来
-        BigDecimal ableDivide = amount.subtract(BigDecimalUtils.get((num - 1) * 0.01));
+    default BigDecimal divide(BigDecimal amount){
 
-        if (ableDivide.compareTo(MIN_MONEY) == 0)
+        if (amount.compareTo(MIN_MONEY) == 0)
             return MIN_MONEY;
         else {
 
             Random random = new Random();
-            int i = random.nextInt(ableDivide.multiply(BigDecimalUtils.get(100)).intValue());
+            double max = amount.doubleValue();
+            double i = random.nextDouble();
             if (i == 0)
                 return MIN_MONEY;
             else
-                return new BigDecimal(i/100);
+                return BigDecimalUtils.get(max * i);
 
         }
 

@@ -43,17 +43,34 @@ public class RedPacketApplication {
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
+    BigDecimal snatchAmount = BigDecimal.ZERO;
+
     public void synchRun() throws Exception {
         Person p1 = new Person(1, "王五", BigDecimalUtils.get(100));
 
-        redPacketService.create(BigDecimalUtils.get(0.05), 5, "发红包喽", p1);
-
-        for (int i = 0; i < 24; i++) {
-            Person p = new Person(1, "测试"+i, BigDecimal.ZERO);
+        List<Person> personList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Person p = new Person(1, "测试人"+i, BigDecimal.ZERO);
+            //new SynchConsumer(p, snatch).run();
+            personList.add(p);
             threadPoolExecutor.submit(new SynchConsumer(p, snatch));
         }
 
-        System.out.println(p1);
+        for (int i = 1; i < 11; i++) {
+            snatchAmount = BigDecimal.ZERO;
+            System.err.println("--------------------------------" + i + ">>>>>");
+            Thread.sleep(5000);
+            redPacketService.create(BigDecimalUtils.get(i), 5, "发红包喽" + i, p1);
+            Thread.sleep(5000);
+            System.err.println(p1);
+
+
+            personList.forEach(item -> {
+                snatchAmount = snatchAmount.add(item.getAmount());
+            });
+            System.out.println("一共抢了 " + snatchAmount);
+            System.err.println("--------------------------------" + i + "<<<<<");
+        }
     }
 }
 

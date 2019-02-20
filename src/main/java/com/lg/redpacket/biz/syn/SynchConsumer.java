@@ -31,18 +31,20 @@ public class SynchConsumer implements Runnable{
     @Override
     public void run() {
         while (true){
-
+            //System.err.println("===我要抢了。。。" + person.getName());
             //查询是否存在没有被抢的红包
             SynchSendSnatch.redPacketMap.forEach((k,v)->{
                 if (!snatched.contains(k)){
                     BigDecimal snatch = iSnatch.snatch(v);
-                    if (null != snatch)
+                    if (null != snatch) {
                         person.setAmount(person.getAmount().add(snatch));
-                    System.out.println(person);
+                        System.out.println(person);
+                        snatched.add(k);
+                    }
                 }
             });
             try {
-                Thread.sleep(200);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

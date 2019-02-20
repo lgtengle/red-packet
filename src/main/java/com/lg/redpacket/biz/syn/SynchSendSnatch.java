@@ -3,6 +3,7 @@ package com.lg.redpacket.biz.syn;
 import com.lg.redpacket.biz.ISend;
 import com.lg.redpacket.biz.ISnatch;
 import com.lg.redpacket.biz.RedPacketService;
+import com.lg.redpacket.common.BigDecimalUtils;
 import com.lg.redpacket.model.Person;
 import com.lg.redpacket.model.RedPacket;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +40,18 @@ public class SynchSendSnatch implements ISnatch, ISend {
     public BigDecimal snatch(RedPacket redPacket) {
         if (redPacket.getLeftAmount().compareTo(MIN_MONEY) >= 0) {
             synchronized (redPacket) {
-                if (redPacket.getLeftAmount().compareTo(MIN_MONEY) >= 0) {
-                    BigDecimal divide = divide(redPacket.getLeftAmount(), redPacket.getLeftNum());
+                Integer leftNum = redPacket.getLeftNum();
+                if (redPacket.getLeftAmount().compareTo(MIN_MONEY) >= 0 && leftNum > 0) {
+                    BigDecimal divide = null;
+                    if (leftNum != 1){
+                        //先将其他人的最少可以分到的钱预留出来
+                        BigDecimal ableDivide = redPacket.getLeftAmount().subtract(BigDecimalUtils.get((leftNum - 1) * 0.01));
+                        divide = BigDecimalUtils.get(this.divide(ableDivide));
+                    }else
+                        divide = redPacket.getLeftAmount();
+
                     redPacket.setLeftAmount(redPacket.getLeftAmount().subtract(divide));
-                    redPacket.setLeftNum(redPacket.getLeftNum()-1);
+                    redPacket.setLeftNum(leftNum -1);
                     return divide;
                 }else
                     return null;
