@@ -43,8 +43,6 @@ public class RedPacketApplication {
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
-    BigDecimal snatchAmount = BigDecimal.ZERO;
-
     public void synchRun() throws Exception {
         Person p1 = new Person(1, "王五", BigDecimalUtils.get(100));
 
@@ -57,18 +55,14 @@ public class RedPacketApplication {
         }
 
         for (int i = 1; i < 11; i++) {
-            snatchAmount = BigDecimal.ZERO;
             System.err.println("--------------------------------" + i + ">>>>>");
             Thread.sleep(5000);
             redPacketService.create(BigDecimalUtils.get(i), 5, "发红包喽" + i, p1);
             Thread.sleep(5000);
             System.err.println(p1);
 
-
-            personList.forEach(item -> {
-                snatchAmount = snatchAmount.add(item.getAmount());
-            });
-            System.out.println("一共抢了 " + snatchAmount);
+            System.out.println("一共抢了 " + personList.stream()
+                    .mapToDouble(w -> w.getAmount().doubleValue()).sum());
             System.err.println("--------------------------------" + i + "<<<<<");
         }
     }
