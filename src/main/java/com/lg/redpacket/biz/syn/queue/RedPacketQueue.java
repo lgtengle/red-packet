@@ -1,6 +1,7 @@
 package com.lg.redpacket.biz.syn.queue;
 
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>
@@ -13,24 +14,25 @@ import java.util.Date;
  */
 public class RedPacketQueue<T> {
 
+    private ReentrantLock lock = new ReentrantLock();
+
     private NodeValue<T> head;
 
     private NodeValue<T> tail;
 
     public void add(T val){
         NodeValue<T> node = new NodeValue<>(val);
+        NodeValue<T> temp = tail;
+        tail = node;
         if (null == head){
             node.next = null;
             node.pre = null;
             head = node;
         }else {
-            NodeValue<T> temp = tail;
-            tail = node
+            if (temp != null)
+                temp.next = tail;
 
-            ;
-            temp.next = tail;
             tail.pre = temp;
-
         }
     }
 }
