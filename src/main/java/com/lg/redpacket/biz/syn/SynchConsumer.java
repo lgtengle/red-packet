@@ -2,6 +2,7 @@ package com.lg.redpacket.biz.syn;
 
 import com.lg.redpacket.biz.ISnatch;
 import com.lg.redpacket.model.Person;
+import com.lg.redpacket.model.RedPacket;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -17,7 +18,7 @@ import java.util.HashSet;
  */
 public class SynchConsumer implements Runnable{
 
-    private HashSet<Integer> snatched = new HashSet();
+    //private HashSet<Integer> snatched = new HashSet();
 
     private Person person;
 
@@ -30,10 +31,11 @@ public class SynchConsumer implements Runnable{
 
     @Override
     public void run() {
+
         while (true){
             //System.err.println("===我要抢了。。。" + person.getName());
             //查询是否存在没有被抢的红包
-            SynchSendSnatch.redPacketMap.forEach((k,v)->{
+            /*SynchSendSnatch.redPacketMap.forEach((k,v)->{
                 if (!snatched.contains(k)){
                     BigDecimal snatch = iSnatch.snatch(v);
                     if (null != snatch) {
@@ -42,12 +44,19 @@ public class SynchConsumer implements Runnable{
                         snatched.add(k);
                     }
                 }
-            });
+            });*/
             try {
-                Thread.sleep(500);
+                Integer id = SynchSendSnatch.REDPACKET_MESSAGE.take();
+                RedPacket v = SynchSendSnatch.redPacketMap.get(id);
+                BigDecimal snatch = iSnatch.snatch(v);
+                if (null != snatch) {
+                    person.setAmount(person.getAmount().add(snatch));
+                    System.out.println(person);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
         }
     }
 }

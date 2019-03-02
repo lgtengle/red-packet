@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * <p>
@@ -27,12 +29,19 @@ public class SynchSendSnatch implements ISnatch, ISend {
 
     public static Map<Integer, RedPacket> redPacketMap = new HashMap<>();
 
+    /**
+     * 红包阻塞队列
+     */
+    public static BlockingDeque<Integer> REDPACKET_MESSAGE = new LinkedBlockingDeque<>();
+
     @Autowired
     RedPacketService redPacketService;
 
     @Override
     public boolean send(RedPacket redPacket) {
-        redPacketMap.put(redPacket.getId(), redPacket);
+        int id = redPacket.getId();
+        redPacketMap.put(id, redPacket);
+        REDPACKET_MESSAGE.add(id);
         return true;
     }
 
