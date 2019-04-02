@@ -1,9 +1,0 @@
-
-thread:
-  pool:
-    # 闲置时,线程最大数量
-    corePoolSize: 10
-    # 最大线程数
-    maximumPoolSize: 10
-    # 等待时间, 单位秒
-    keepAliveTime: 30
